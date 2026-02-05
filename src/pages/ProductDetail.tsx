@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Bell, ExternalLink, Info } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import RecommendationCard from "@/components/RecommendationCard";
+import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCard";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";
 
-// Mock product data with category and price history
+// Mock product data with category and detailed price history
 const products: Record<string, {
   id: string;
   title: string;
@@ -18,6 +19,7 @@ const products: Record<string, {
   image: string;
   category: ProductCategory;
   priceHistory: PriceHistory;
+  priceHistoryData: PriceHistoryData;
   affiliateUrl: string;
 }> = {
   "1": {
@@ -33,6 +35,18 @@ const products: Record<string, {
       lowest90Days: 18500,
       lowest6Months: 17990,
     },
+    priceHistoryData: {
+      lowest30Days: 18500,
+      lowest30DaysDate: "Jan 15, 2026",
+      lowest90Days: 17990,
+      lowest90DaysDate: "Dec 20, 2025",
+      chartData: [
+        { day: "Nov", price: 22990 },
+        { day: "Dec", price: 19990 },
+        { day: "Jan", price: 18500 },
+        { day: "Feb", price: 18990 },
+      ],
+    },
     affiliateUrl: "https://amazon.in",
   },
   "2": {
@@ -47,6 +61,18 @@ const products: Record<string, {
     priceHistory: {
       lowest90Days: 25999,
       lowest6Months: 24999,
+    },
+    priceHistoryData: {
+      lowest30Days: 27500,
+      lowest30DaysDate: "Jan 20, 2026",
+      lowest90Days: 24999,
+      lowest90DaysDate: "Nov 25, 2025",
+      chartData: [
+        { day: "Nov", price: 24999 },
+        { day: "Dec", price: 29999 },
+        { day: "Jan", price: 27500 },
+        { day: "Feb", price: 26999 },
+      ],
     },
     affiliateUrl: "https://flipkart.com",
   },
@@ -64,6 +90,18 @@ const products: Record<string, {
       lowest6Months: 25990,
       preSalePrice: 27500,
     },
+    priceHistoryData: {
+      lowest30Days: 26990,
+      lowest30DaysDate: "Jan 10, 2026",
+      lowest90Days: 25990,
+      lowest90DaysDate: "Dec 1, 2025",
+      chartData: [
+        { day: "Nov", price: 29990 },
+        { day: "Dec", price: 25990 },
+        { day: "Jan", price: 26990 },
+        { day: "Feb", price: 28990 },
+      ],
+    },
     affiliateUrl: "https://amazon.in",
   },
   "4": {
@@ -78,6 +116,18 @@ const products: Record<string, {
     priceHistory: {
       lowest90Days: 48900,
       lowest6Months: 46900,
+    },
+    priceHistoryData: {
+      lowest30Days: 48900,
+      lowest30DaysDate: "Jan 25, 2026",
+      lowest90Days: 46900,
+      lowest90DaysDate: "Nov 15, 2025",
+      chartData: [
+        { day: "Nov", price: 46900 },
+        { day: "Dec", price: 52900 },
+        { day: "Jan", price: 48900 },
+        { day: "Feb", price: 49900 },
+      ],
     },
     affiliateUrl: "https://flipkart.com",
   },
