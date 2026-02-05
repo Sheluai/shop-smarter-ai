@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Bell, ExternalLink, Info, Sparkles } from "lucide-react";
+import { ArrowLeft, Heart, Bell, ExternalLink, Info } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import RecommendationCard from "@/components/RecommendationCard";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";
 
-// Mock product data
+// Mock product data with category and price history
 const products: Record<string, {
   id: string;
   title: string;
@@ -14,7 +16,8 @@ const products: Record<string, {
   discount: number;
   platform: "Amazon" | "Flipkart";
   image: string;
-  recommendation: "buy" | "wait";
+  category: ProductCategory;
+  priceHistory: PriceHistory;
   affiliateUrl: string;
 }> = {
   "1": {
@@ -25,7 +28,11 @@ const products: Record<string, {
     discount: 24,
     platform: "Amazon",
     image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&h=400&fit=crop",
-    recommendation: "buy",
+    category: "mobiles",
+    priceHistory: {
+      lowest90Days: 18500,
+      lowest6Months: 17990,
+    },
     affiliateUrl: "https://amazon.in",
   },
   "2": {
@@ -36,7 +43,11 @@ const products: Record<string, {
     discount: 25,
     platform: "Flipkart",
     image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
-    recommendation: "buy",
+    category: "electronics",
+    priceHistory: {
+      lowest90Days: 25999,
+      lowest6Months: 24999,
+    },
     affiliateUrl: "https://flipkart.com",
   },
   "3": {
@@ -47,7 +58,12 @@ const products: Record<string, {
     discount: 17,
     platform: "Amazon",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-    recommendation: "wait",
+    category: "electronics",
+    priceHistory: {
+      lowest90Days: 26990,
+      lowest6Months: 25990,
+      preSalePrice: 27500,
+    },
     affiliateUrl: "https://amazon.in",
   },
   "4": {
@@ -58,7 +74,11 @@ const products: Record<string, {
     discount: 17,
     platform: "Flipkart",
     image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=400&fit=crop",
-    recommendation: "wait",
+    category: "electronics",
+    priceHistory: {
+      lowest90Days: 48900,
+      lowest6Months: 46900,
+    },
     affiliateUrl: "https://flipkart.com",
   },
 };
