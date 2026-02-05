@@ -4,6 +4,8 @@ import { ArrowLeft, Heart, Bell, ExternalLink, Info } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import RecommendationCard from "@/components/RecommendationCard";
 import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCard";
+import PriceComparisonCard, { PlatformPrice } from "@/components/PriceComparisonCard";
+import AIAlternativesCard, { AlternativeProduct } from "@/components/AIAlternativesCard";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";
