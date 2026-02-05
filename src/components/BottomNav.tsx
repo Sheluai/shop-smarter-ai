@@ -13,7 +13,7 @@ const BottomNav = () => {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border">
+    <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border/50">
       <div className="flex items-center justify-around max-w-lg mx-auto px-4 py-2 pb-6">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -31,25 +31,24 @@ const BottomNav = () => {
               >
                 <Icon
                   className={`w-6 h-6 transition-colors duration-200 ${
-                    isActive ? "text-primary" : "text-muted-foreground"
+                    isActive ? "text-foreground" : "text-muted-foreground"
                   }`}
-                  strokeWidth={isActive ? 2.5 : 2}
+                  strokeWidth={isActive ? 2.5 : 1.5}
                 />
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                )}
               </motion.div>
-              <span
-                className={`text-xs font-medium transition-colors duration-200 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
+              {/* Show text only on active tab */}
+              <motion.span
+                initial={false}
+                animate={{
+                  opacity: isActive ? 1 : 0,
+                  y: isActive ? 0 : 5,
+                  height: isActive ? "auto" : 0,
+                }}
+                transition={{ duration: 0.2 }}
+                className={`text-xs font-medium text-foreground overflow-hidden`}
               >
                 {item.label}
-              </span>
+              </motion.span>
             </NavLink>
           );
         })}
