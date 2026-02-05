@@ -4,11 +4,13 @@ import { ArrowLeft, Heart, Bell, ExternalLink, Info } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import RecommendationCard from "@/components/RecommendationCard";
 import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCard";
+import PriceComparisonCard, { PlatformPrice } from "@/components/PriceComparisonCard";
+import AIAlternativesCard, { AlternativeProduct } from "@/components/AIAlternativesCard";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";
 
-// Mock product data with category and detailed price history
+// Mock product data with category, price history, and comparison data
 const products: Record<string, {
   id: string;
   title: string;
@@ -20,6 +22,8 @@ const products: Record<string, {
   category: ProductCategory;
   priceHistory: PriceHistory;
   priceHistoryData: PriceHistoryData;
+  platformPrices: PlatformPrice[];
+  alternatives: AlternativeProduct[];
   affiliateUrl: string;
 }> = {
   "1": {
@@ -31,10 +35,7 @@ const products: Record<string, {
     platform: "Amazon",
     image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&h=400&fit=crop",
     category: "mobiles",
-    priceHistory: {
-      lowest90Days: 18500,
-      lowest6Months: 17990,
-    },
+    priceHistory: { lowest90Days: 18500, lowest6Months: 17990 },
     priceHistoryData: {
       lowest30Days: 18500,
       lowest30DaysDate: "Jan 15, 2026",
@@ -47,6 +48,22 @@ const products: Record<string, {
         { day: "Feb", price: 18990 },
       ],
     },
+    platformPrices: [
+      { platform: "Amazon", price: 18990, deliveryNote: "Free delivery", affiliateUrl: "https://amazon.in" },
+      { platform: "Flipkart", price: 19499, deliveryNote: "2-day delivery", affiliateUrl: "https://flipkart.com" },
+    ],
+    alternatives: [
+      {
+        id: "3",
+        title: "Sony WH-1000XM5 Wireless Noise Cancelling Headphones",
+        price: 28990,
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+        platform: "Amazon",
+        reason: "Better audio quality, over-ear comfort",
+        isBestValue: false,
+        affiliateUrl: "https://amazon.in",
+      },
+    ],
     affiliateUrl: "https://amazon.in",
   },
   "2": {
@@ -58,10 +75,7 @@ const products: Record<string, {
     platform: "Flipkart",
     image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
     category: "electronics",
-    priceHistory: {
-      lowest90Days: 25999,
-      lowest6Months: 24999,
-    },
+    priceHistory: { lowest90Days: 25999, lowest6Months: 24999 },
     priceHistoryData: {
       lowest30Days: 27500,
       lowest30DaysDate: "Jan 20, 2026",
@@ -74,6 +88,22 @@ const products: Record<string, {
         { day: "Feb", price: 26999 },
       ],
     },
+    platformPrices: [
+      { platform: "Flipkart", price: 26999, deliveryNote: "Free delivery", affiliateUrl: "https://flipkart.com" },
+      { platform: "Amazon", price: 28999, deliveryNote: "Prime delivery", affiliateUrl: "https://amazon.in" },
+    ],
+    alternatives: [
+      {
+        id: "1",
+        title: "Apple AirPods Pro (2nd Gen) with MagSafe",
+        price: 18990,
+        image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop",
+        platform: "Amazon",
+        reason: "Cheaper with similar features",
+        isBestValue: true,
+        affiliateUrl: "https://amazon.in",
+      },
+    ],
     affiliateUrl: "https://flipkart.com",
   },
   "3": {
@@ -85,11 +115,7 @@ const products: Record<string, {
     platform: "Amazon",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
     category: "electronics",
-    priceHistory: {
-      lowest90Days: 26990,
-      lowest6Months: 25990,
-      preSalePrice: 27500,
-    },
+    priceHistory: { lowest90Days: 26990, lowest6Months: 25990, preSalePrice: 27500 },
     priceHistoryData: {
       lowest30Days: 26990,
       lowest30DaysDate: "Jan 10, 2026",
@@ -102,6 +128,32 @@ const products: Record<string, {
         { day: "Feb", price: 28990 },
       ],
     },
+    platformPrices: [
+      { platform: "Amazon", price: 28990, deliveryNote: "Prime delivery", affiliateUrl: "https://amazon.in" },
+      { platform: "Flipkart", price: 29990, deliveryNote: "Standard delivery", affiliateUrl: "https://flipkart.com" },
+    ],
+    alternatives: [
+      {
+        id: "1",
+        title: "Apple AirPods Pro (2nd Gen) with MagSafe",
+        price: 18990,
+        image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop",
+        platform: "Amazon",
+        reason: "Cheaper with similar features",
+        isBestValue: true,
+        affiliateUrl: "https://amazon.in",
+      },
+      {
+        id: "2",
+        title: "Samsung Galaxy Watch 6 Classic",
+        price: 26999,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+        platform: "Flipkart",
+        reason: "Better deal this week",
+        isBestValue: false,
+        affiliateUrl: "https://flipkart.com",
+      },
+    ],
     affiliateUrl: "https://amazon.in",
   },
   "4": {
@@ -113,10 +165,7 @@ const products: Record<string, {
     platform: "Flipkart",
     image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=400&fit=crop",
     category: "electronics",
-    priceHistory: {
-      lowest90Days: 48900,
-      lowest6Months: 46900,
-    },
+    priceHistory: { lowest90Days: 48900, lowest6Months: 46900 },
     priceHistoryData: {
       lowest30Days: 48900,
       lowest30DaysDate: "Jan 25, 2026",
@@ -129,6 +178,22 @@ const products: Record<string, {
         { day: "Feb", price: 49900 },
       ],
     },
+    platformPrices: [
+      { platform: "Flipkart", price: 49900, deliveryNote: "Free delivery", affiliateUrl: "https://flipkart.com" },
+      { platform: "Amazon", price: 51900, deliveryNote: "Prime delivery", affiliateUrl: "https://amazon.in" },
+    ],
+    alternatives: [
+      {
+        id: "2",
+        title: "Samsung Galaxy Watch 6 Classic",
+        price: 26999,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+        platform: "Flipkart",
+        reason: "Better rating at similar quality",
+        isBestValue: true,
+        affiliateUrl: "https://flipkart.com",
+      },
+    ],
     affiliateUrl: "https://flipkart.com",
   },
 };
@@ -189,43 +254,25 @@ const ProductDetail = () => {
         </div>
       </motion.header>
 
-      <div className="max-w-lg mx-auto px-4 pt-6">
+      <div className="max-w-lg mx-auto px-4 pt-6 space-y-6">
         {/* Product Image */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="bg-secondary rounded-2xl overflow-hidden mb-6 aspect-square"
+          className="bg-secondary rounded-2xl overflow-hidden aspect-square"
         >
-          <img
-            src={product.image}
-            alt={product.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
         </motion.div>
 
         {/* Product Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-6"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <span className="badge-platform mb-2 inline-block">{product.platform}</span>
-          <h2 className="text-xl font-semibold text-foreground mb-4">
-            {product.title}
-          </h2>
-          
+          <h2 className="text-xl font-semibold text-foreground mb-4">{product.title}</h2>
           <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-foreground">
-              ₹{product.currentPrice.toLocaleString()}
-            </span>
-            <span className="text-lg text-muted-foreground line-through">
-              ₹{product.originalPrice.toLocaleString()}
-            </span>
-            <span className="text-sm font-medium text-success">
-              {product.discount}% off
-            </span>
+            <span className="text-3xl font-bold text-foreground">₹{product.currentPrice.toLocaleString()}</span>
+            <span className="text-lg text-muted-foreground line-through">₹{product.originalPrice.toLocaleString()}</span>
+            <span className="text-sm font-medium text-success">{product.discount}% off</span>
           </div>
         </motion.div>
 
@@ -234,41 +281,28 @@ const ProductDetail = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="affiliate-notice flex gap-3 mb-6"
+          className="affiliate-notice flex gap-3"
         >
           <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          <p>
-            This app uses affiliate links. If you buy through this link, we may earn a small commission at no extra cost to you.
-          </p>
+          <p>This app uses affiliate links. If you buy through this link, we may earn a small commission at no extra cost to you.</p>
         </motion.div>
 
         {/* AI Recommendation */}
-        <div className="mb-6">
-          <RecommendationCard
-            recommendation={getRecommendation(
-              product.category,
-              product.currentPrice,
-              product.originalPrice,
-              product.priceHistory
-            )}
-          />
-        </div>
+        <RecommendationCard
+          recommendation={getRecommendation(product.category, product.currentPrice, product.originalPrice, product.priceHistory)}
+        />
 
         {/* Price History */}
-        <div className="mb-6">
-          <PriceHistoryCard
-            currentPrice={product.currentPrice}
-            priceHistory={product.priceHistoryData}
-          />
-        </div>
+        <PriceHistoryCard currentPrice={product.currentPrice} priceHistory={product.priceHistoryData} />
+
+        {/* Price Comparison */}
+        {product.platformPrices.length > 1 && <PriceComparisonCard prices={product.platformPrices} />}
+
+        {/* AI Alternative Suggestions */}
+        {product.alternatives.length > 0 && <AIAlternativesCard alternatives={product.alternatives} />}
 
         {/* Action Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="space-y-3"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="space-y-3">
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={handleOpenStore}
@@ -282,9 +316,7 @@ const ProductDetail = () => {
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={handleWishlist}
-              className={`btn-secondary flex items-center justify-center gap-2 ${
-                isWishlisted ? "bg-destructive/10 text-destructive" : ""
-              }`}
+              className={`btn-secondary flex items-center justify-center gap-2 ${isWishlisted ? "bg-destructive/10 text-destructive" : ""}`}
             >
               <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
               {isWishlisted ? "Saved" : "Wishlist"}
@@ -293,9 +325,7 @@ const ProductDetail = () => {
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={handleSetAlert}
-              className={`btn-secondary flex items-center justify-center gap-2 ${
-                hasAlert ? "bg-warning/10 text-warning" : ""
-              }`}
+              className={`btn-secondary flex items-center justify-center gap-2 ${hasAlert ? "bg-warning/10 text-warning" : ""}`}
             >
               <Bell className={`w-5 h-5 ${hasAlert ? "fill-current" : ""}`} />
               {hasAlert ? "Alert Set" : "Set Alert"}
