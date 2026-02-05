@@ -193,30 +193,16 @@ const ProductDetail = () => {
         </motion.div>
 
         {/* AI Recommendation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className={`rounded-xl p-4 mb-6 ${
-            product.recommendation === "buy"
-              ? "bg-success/10 border border-success/20"
-              : "bg-warning/10 border border-warning/20"
-          }`}
-        >
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles className={`w-4 h-4 ${
-              product.recommendation === "buy" ? "text-success" : "text-warning"
-            }`} />
-            <span className="text-sm font-medium text-foreground">AI Recommendation</span>
-          </div>
-          <p className={`text-sm ${
-            product.recommendation === "buy" ? "text-success" : "text-warning"
-          }`}>
-            {product.recommendation === "buy"
-              ? "Good time to buy — price is at a recent low"
-              : "You may wait for a price drop — prices often go lower"}
-          </p>
-        </motion.div>
+        <div className="mb-6">
+          <RecommendationCard
+            recommendation={getRecommendation(
+              product.category,
+              product.currentPrice,
+              product.originalPrice,
+              product.priceHistory
+            )}
+          />
+        </div>
 
         {/* Action Buttons */}
         <motion.div
