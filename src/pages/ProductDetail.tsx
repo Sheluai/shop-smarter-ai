@@ -254,6 +254,14 @@ const ProductDetail = () => {
           />
         </div>
 
+        {/* Price History */}
+        <div className="mb-6">
+          <PriceHistoryCard
+            currentPrice={product.currentPrice}
+            priceHistory={product.priceHistoryData}
+          />
+        </div>
+
         {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
