@@ -58,10 +58,10 @@ const PriceHistoryCard = ({ currentPrice, priceHistory }: PriceHistoryCardProps)
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center gap-2 mb-4 p-3 bg-red-50 border border-red-200 rounded-lg"
+          className="flex items-center gap-2 mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg"
         >
-          <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
-          <span className="text-sm text-red-600 font-medium">
+          <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+          <span className="text-sm text-destructive font-medium">
             ⚠️ Price was lower recently (₹{priceHistory.lowest30Days.toLocaleString()})
           </span>
         </motion.div>
