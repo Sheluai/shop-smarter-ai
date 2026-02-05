@@ -10,7 +10,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";
 
-// Mock product data with category and detailed price history
+// Mock product data with category, price history, and comparison data
 const products: Record<string, {
   id: string;
   title: string;
@@ -22,9 +22,194 @@ const products: Record<string, {
   category: ProductCategory;
   priceHistory: PriceHistory;
   priceHistoryData: PriceHistoryData;
+  platformPrices: PlatformPrice[];
+  alternatives: AlternativeProduct[];
   affiliateUrl: string;
 }> = {
   "1": {
+    id: "1",
+    title: "Apple AirPods Pro (2nd Gen) with MagSafe Charging Case",
+    originalPrice: 24900,
+    currentPrice: 18990,
+    discount: 24,
+    platform: "Amazon",
+    image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&h=400&fit=crop",
+    category: "mobiles",
+    priceHistory: {
+      lowest90Days: 18500,
+      lowest6Months: 17990,
+    },
+    priceHistoryData: {
+      lowest30Days: 18500,
+      lowest30DaysDate: "Jan 15, 2026",
+      lowest90Days: 17990,
+      lowest90DaysDate: "Dec 20, 2025",
+      chartData: [
+        { day: "Nov", price: 22990 },
+        { day: "Dec", price: 19990 },
+        { day: "Jan", price: 18500 },
+        { day: "Feb", price: 18990 },
+      ],
+    },
+    platformPrices: [
+      { platform: "Amazon", price: 18990, deliveryNote: "Free delivery", affiliateUrl: "https://amazon.in" },
+      { platform: "Flipkart", price: 19499, deliveryNote: "2-day delivery", affiliateUrl: "https://flipkart.com" },
+    ],
+    alternatives: [
+      {
+        id: "3",
+        title: "Sony WH-1000XM5 Wireless Noise Cancelling Headphones",
+        price: 28990,
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+        platform: "Amazon",
+        reason: "Better audio quality, over-ear comfort",
+        isBestValue: false,
+        affiliateUrl: "https://amazon.in",
+      },
+    ],
+    affiliateUrl: "https://amazon.in",
+  },
+  "2": {
+    id: "2",
+    title: "Samsung Galaxy Watch 6 Classic Bluetooth Smart Watch",
+    originalPrice: 35999,
+    currentPrice: 26999,
+    discount: 25,
+    platform: "Flipkart",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
+    category: "electronics",
+    priceHistory: {
+      lowest90Days: 25999,
+      lowest6Months: 24999,
+    },
+    priceHistoryData: {
+      lowest30Days: 27500,
+      lowest30DaysDate: "Jan 20, 2026",
+      lowest90Days: 24999,
+      lowest90DaysDate: "Nov 25, 2025",
+      chartData: [
+        { day: "Nov", price: 24999 },
+        { day: "Dec", price: 29999 },
+        { day: "Jan", price: 27500 },
+        { day: "Feb", price: 26999 },
+      ],
+    },
+    platformPrices: [
+      { platform: "Flipkart", price: 26999, deliveryNote: "Free delivery", affiliateUrl: "https://flipkart.com" },
+      { platform: "Amazon", price: 28999, deliveryNote: "Prime delivery", affiliateUrl: "https://amazon.in" },
+    ],
+    alternatives: [
+      {
+        id: "1",
+        title: "Apple AirPods Pro (2nd Gen) with MagSafe",
+        price: 18990,
+        image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop",
+        platform: "Amazon",
+        reason: "Cheaper with similar features",
+        isBestValue: true,
+        affiliateUrl: "https://amazon.in",
+      },
+    ],
+    affiliateUrl: "https://flipkart.com",
+  },
+  "3": {
+    id: "3",
+    title: "Sony WH-1000XM5 Wireless Noise Cancelling Headphones",
+    originalPrice: 34990,
+    currentPrice: 28990,
+    discount: 17,
+    platform: "Amazon",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
+    category: "electronics",
+    priceHistory: {
+      lowest90Days: 26990,
+      lowest6Months: 25990,
+      preSalePrice: 27500,
+    },
+    priceHistoryData: {
+      lowest30Days: 26990,
+      lowest30DaysDate: "Jan 10, 2026",
+      lowest90Days: 25990,
+      lowest90DaysDate: "Dec 1, 2025",
+      chartData: [
+        { day: "Nov", price: 29990 },
+        { day: "Dec", price: 25990 },
+        { day: "Jan", price: 26990 },
+        { day: "Feb", price: 28990 },
+      ],
+    },
+    platformPrices: [
+      { platform: "Amazon", price: 28990, deliveryNote: "Prime delivery", affiliateUrl: "https://amazon.in" },
+      { platform: "Flipkart", price: 29990, deliveryNote: "Standard delivery", affiliateUrl: "https://flipkart.com" },
+    ],
+    alternatives: [
+      {
+        id: "1",
+        title: "Apple AirPods Pro (2nd Gen) with MagSafe",
+        price: 18990,
+        image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop",
+        platform: "Amazon",
+        reason: "Cheaper with similar features",
+        isBestValue: true,
+        affiliateUrl: "https://amazon.in",
+      },
+      {
+        id: "2",
+        title: "Samsung Galaxy Watch 6 Classic",
+        price: 26999,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+        platform: "Flipkart",
+        reason: "Better deal this week",
+        isBestValue: false,
+        affiliateUrl: "https://flipkart.com",
+      },
+    ],
+    affiliateUrl: "https://amazon.in",
+  },
+  "4": {
+    id: "4",
+    title: "iPad Air M1 Chip 10.9-inch Liquid Retina Display",
+    originalPrice: 59900,
+    currentPrice: 49900,
+    discount: 17,
+    platform: "Flipkart",
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=400&fit=crop",
+    category: "electronics",
+    priceHistory: {
+      lowest90Days: 48900,
+      lowest6Months: 46900,
+    },
+    priceHistoryData: {
+      lowest30Days: 48900,
+      lowest30DaysDate: "Jan 25, 2026",
+      lowest90Days: 46900,
+      lowest90DaysDate: "Nov 15, 2025",
+      chartData: [
+        { day: "Nov", price: 46900 },
+        { day: "Dec", price: 52900 },
+        { day: "Jan", price: 48900 },
+        { day: "Feb", price: 49900 },
+      ],
+    },
+    platformPrices: [
+      { platform: "Flipkart", price: 49900, deliveryNote: "Free delivery", affiliateUrl: "https://flipkart.com" },
+      { platform: "Amazon", price: 51900, deliveryNote: "Prime delivery", affiliateUrl: "https://amazon.in" },
+    ],
+    alternatives: [
+      {
+        id: "2",
+        title: "Samsung Galaxy Watch 6 Classic",
+        price: 26999,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+        platform: "Flipkart",
+        reason: "Better rating at similar quality",
+        isBestValue: true,
+        affiliateUrl: "https://flipkart.com",
+      },
+    ],
+    affiliateUrl: "https://flipkart.com",
+  },
+};
     id: "1",
     title: "Apple AirPods Pro (2nd Gen) with MagSafe Charging Case",
     originalPrice: 24900,
