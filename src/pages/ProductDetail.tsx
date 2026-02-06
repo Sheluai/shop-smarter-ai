@@ -7,6 +7,7 @@ import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCar
 import PriceComparisonCard, { PlatformPrice } from "@/components/PriceComparisonCard";
 import AIAlternativesCard, { AlternativeProduct } from "@/components/AIAlternativesCard";
 import PriceAlertSheet from "@/components/PriceAlertSheet";
+import NotificationBanner from "@/components/NotificationBanner";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";

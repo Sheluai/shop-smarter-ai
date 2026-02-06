@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export interface PriceAlert {
   productId: string;
@@ -20,13 +21,17 @@ interface PriceAlertContextType {
   getAlert: (productId: string) => PriceAlert | undefined;
   hasAlert: (productId: string) => boolean;
   checkAlertTriggered: (productId: string, currentPrice: number) => boolean;
+  notificationPermission: string;
+  requestNotificationPermission: () => Promise<boolean>;
 }
 
 const PriceAlertContext = createContext<PriceAlertContextType | undefined>(undefined);
 
 export const PriceAlertProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { permission, requestPermission, sendNotification } = useNotifications();
+  const notifiedRef = useRef<Set<string>>(new Set());
+
   const [alerts, setAlerts] = useState<PriceAlert[]>([
-    // Seed data for demo
     {
       productId: "1",
       targetPrice: 17999,
@@ -51,15 +56,39 @@ export const PriceAlertProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     },
   ]);
 
-  const addAlert = useCallback((alert: PriceAlert) => {
-    setAlerts((prev) => {
-      const filtered = prev.filter((a) => a.productId !== alert.productId);
-      return [...filtered, alert];
-    });
-  }, []);
+  const triggerNotification = useCallback(
+    (alert: PriceAlert) => {
+      if (notifiedRef.current.has(alert.productId)) return;
+      notifiedRef.current.add(alert.productId);
+
+      sendNotification({
+        title: "🔥 Price Drop Alert!",
+        body: `${alert.productTitle} is now ₹${alert.currentPrice.toLocaleString()}. Tap to view deal.`,
+        icon: alert.image,
+        data: { productId: alert.productId },
+      });
+    },
+    [sendNotification]
+  );
+
+  const addAlert = useCallback(
+    (alert: PriceAlert) => {
+      setAlerts((prev) => {
+        const filtered = prev.filter((a) => a.productId !== alert.productId);
+        return [...filtered, alert];
+      });
+
+      // Send notification immediately if already triggered
+      if (alert.status === "triggered") {
+        triggerNotification(alert);
+      }
+    },
+    [triggerNotification]
+  );
 
   const removeAlert = useCallback((productId: string) => {
     setAlerts((prev) => prev.filter((a) => a.productId !== productId));
+    notifiedRef.current.delete(productId);
   }, []);
 
   const updateAlertPrice = useCallback((productId: string, newTargetPrice: number) => {
@@ -68,6 +97,7 @@ export const PriceAlertProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         a.productId === productId ? { ...a, targetPrice: newTargetPrice, status: "active" as const } : a
       )
     );
+    notifiedRef.current.delete(productId);
   }, []);
 
   const getAlert = useCallback(
@@ -83,14 +113,34 @@ export const PriceAlertProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const checkAlertTriggered = useCallback(
     (productId: string, currentPrice: number) => {
       const alert = alerts.find((a) => a.productId === productId);
+      if (alert && currentPrice <= alert.targetPrice && alert.status === "active") {
+        // Trigger the alert and send notification
+        setAlerts((prev) =>
+          prev.map((a) =>
+            a.productId === productId ? { ...a, status: "triggered" as const, currentPrice } : a
+          )
+        );
+        triggerNotification({ ...alert, currentPrice, status: "triggered" });
+        return true;
+      }
       return alert ? currentPrice <= alert.targetPrice : false;
     },
-    [alerts]
+    [alerts, triggerNotification]
   );
 
   return (
     <PriceAlertContext.Provider
-      value={{ alerts, addAlert, removeAlert, updateAlertPrice, getAlert, hasAlert, checkAlertTriggered }}
+      value={{
+        alerts,
+        addAlert,
+        removeAlert,
+        updateAlertPrice,
+        getAlert,
+        hasAlert,
+        checkAlertTriggered,
+        notificationPermission: permission,
+        requestNotificationPermission: requestPermission,
+      }}
     >
       {children}
     </PriceAlertContext.Provider>
