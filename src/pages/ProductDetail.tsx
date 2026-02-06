@@ -6,9 +6,11 @@ import RecommendationCard from "@/components/RecommendationCard";
 import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCard";
 import PriceComparisonCard, { PlatformPrice } from "@/components/PriceComparisonCard";
 import AIAlternativesCard, { AlternativeProduct } from "@/components/AIAlternativesCard";
+import PriceAlertSheet from "@/components/PriceAlertSheet";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";
+import { usePriceAlerts } from "@/contexts/PriceAlertContext";
 
 // Mock product data with category, price history, and comparison data
 const products: Record<string, {
@@ -202,7 +204,8 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [hasAlert, setHasAlert] = useState(false);
+  const [alertSheetOpen, setAlertSheetOpen] = useState(false);
+  const { addAlert, removeAlert, getAlert, hasAlert: hasAlertForProduct } = usePriceAlerts();
 
   const product = id ? products[id] : null;
 
@@ -213,6 +216,10 @@ const ProductDetail = () => {
       </div>
     );
   }
+
+  const existingAlert = getAlert(product.id);
+  const isAlertActive = hasAlertForProduct(product.id);
+  const isAlertTriggered = existingAlert?.status === "triggered";
 
   const handleOpenStore = () => {
     window.open(product.affiliateUrl, "_blank");
@@ -227,10 +234,32 @@ const ProductDetail = () => {
   };
 
   const handleSetAlert = () => {
-    setHasAlert(!hasAlert);
+    if (isAlertActive) {
+      removeAlert(product.id);
+      toast({
+        title: "Alert Removed",
+        description: "You won't receive notifications for this product",
+      });
+    } else {
+      setAlertSheetOpen(true);
+    }
+  };
+
+  const handleActivateAlert = (targetPrice: number) => {
+    addAlert({
+      productId: product.id,
+      targetPrice,
+      currentPrice: product.currentPrice,
+      productTitle: product.title,
+      platform: product.platform,
+      image: product.image,
+      affiliateUrl: product.affiliateUrl,
+      status: product.currentPrice <= targetPrice ? "triggered" : "active",
+      createdAt: Date.now(),
+    });
     toast({
-      title: hasAlert ? "Alert Removed" : "Price Alert Set",
-      description: hasAlert ? "You won't receive notifications for this product" : "We'll notify you when the price drops",
+      title: "Price Alert Set! 🔔",
+      description: `We'll notify you when the price drops to ₹${targetPrice.toLocaleString()}`,
     });
   };
 
@@ -276,6 +305,26 @@ const ProductDetail = () => {
           </div>
         </motion.div>
 
+        {/* Active Alert Banner */}
+        {isAlertActive && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`flex items-center gap-3 rounded-xl p-3 ${
+              isAlertTriggered
+                ? "bg-success/10 border border-success/20"
+                : "bg-warning/10 border border-warning/20"
+            }`}
+          >
+            <Bell className={`w-4 h-4 flex-shrink-0 ${isAlertTriggered ? "text-success" : "text-warning"}`} />
+            <p className="text-sm text-foreground">
+              {isAlertTriggered
+                ? "🔥 Price alert triggered! This is a great time to buy."
+                : `Alert active at ₹${existingAlert?.targetPrice.toLocaleString()}`}
+            </p>
+          </motion.div>
+        )}
+
         {/* Affiliate Disclosure */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -306,10 +355,12 @@ const ProductDetail = () => {
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={handleOpenStore}
-            className="btn-primary w-full flex items-center justify-center gap-2"
+            className={`btn-primary w-full flex items-center justify-center gap-2 ${
+              isAlertTriggered ? "bg-success text-success-foreground" : ""
+            }`}
           >
             <ExternalLink className="w-5 h-5" />
-            Open on Store
+            {isAlertTriggered ? "Open Best Price 🔥" : "Open on Store"}
           </motion.button>
 
           <div className="grid grid-cols-2 gap-3">
@@ -325,14 +376,30 @@ const ProductDetail = () => {
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={handleSetAlert}
-              className={`btn-secondary flex items-center justify-center gap-2 ${hasAlert ? "bg-warning/10 text-warning" : ""}`}
+              className={`btn-secondary flex items-center justify-center gap-2 ${
+                isAlertTriggered
+                  ? "bg-success/10 text-success"
+                  : isAlertActive
+                  ? "bg-warning/10 text-warning"
+                  : ""
+              }`}
             >
-              <Bell className={`w-5 h-5 ${hasAlert ? "fill-current" : ""}`} />
-              {hasAlert ? "Alert Set" : "Set Alert"}
+              <Bell className={`w-5 h-5 ${isAlertActive ? "fill-current" : ""}`} />
+              {isAlertTriggered ? "Triggered!" : isAlertActive ? "Alert Set" : "Set Alert"}
             </motion.button>
           </div>
         </motion.div>
       </div>
+
+      {/* Price Alert Bottom Sheet */}
+      <PriceAlertSheet
+        open={alertSheetOpen}
+        onOpenChange={setAlertSheetOpen}
+        currentPrice={product.currentPrice}
+        lowestPrice90Days={product.priceHistoryData.lowest90Days}
+        productTitle={product.title}
+        onActivate={handleActivateAlert}
+      />
 
       <BottomNav />
     </div>
