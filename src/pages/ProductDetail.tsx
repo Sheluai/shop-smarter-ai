@@ -285,6 +285,8 @@ const ProductDetail = () => {
       </motion.header>
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-6">
+        {/* Notification Permission Banner */}
+        <NotificationBanner />
         {/* Product Image */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

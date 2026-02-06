@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Bell, TrendingDown, Check, Trash2, Edit3, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
+import NotificationBanner from "@/components/NotificationBanner";
 import { usePriceAlerts } from "@/contexts/PriceAlertContext";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
