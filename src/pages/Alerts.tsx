@@ -69,6 +69,11 @@ const Alerts = () => {
           </p>
         </motion.div>
 
+        {/* Notification Permission Banner */}
+        <div className="mb-4">
+          <NotificationBanner />
+        </div>
+
         {/* Empty State */}
         {alerts.length === 0 && (
           <motion.div
