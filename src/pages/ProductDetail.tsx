@@ -7,6 +7,7 @@ import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCar
 import PriceComparisonCard, { PlatformPrice } from "@/components/PriceComparisonCard";
 import AIAlternativesCard, { AlternativeProduct } from "@/components/AIAlternativesCard";
 import PriceAlertSheet from "@/components/PriceAlertSheet";
+import NotificationBanner from "@/components/NotificationBanner";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getRecommendation, ProductCategory, PriceHistory } from "@/lib/recommendation";
@@ -284,6 +285,8 @@ const ProductDetail = () => {
       </motion.header>
 
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-6">
+        {/* Notification Permission Banner */}
+        <NotificationBanner />
         {/* Product Image */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
