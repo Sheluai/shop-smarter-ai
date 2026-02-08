@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ExternalLink, Check } from "lucide-react";
+import { ExternalLink, Check, AlertCircle } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
 
 export interface PlatformPrice {
   platform: "Amazon" | "Flipkart";
@@ -63,8 +65,9 @@ const PriceComparisonCard = ({ prices }: PriceComparisonCardProps) => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 * index }}
-                  onClick={() => window.open(item.affiliateUrl, "_blank")}
-                  className={`w-full flex items-center justify-between p-3 hover:bg-secondary/50 transition-colors ${
+                  onClick={() => openAffiliateLink(item.affiliateUrl, item.platform)}
+                  disabled={!hasValidAffiliateUrl(item.affiliateUrl)}
+                  className={`w-full flex items-center justify-between p-3 hover:bg-secondary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     item.isLowest ? "bg-success/10" : "bg-background"
                   }`}
                 >
@@ -78,6 +81,12 @@ const PriceComparisonCard = ({ prices }: PriceComparisonCardProps) => {
                       <p className="text-sm font-medium text-foreground">{item.platform}</p>
                       {item.deliveryNote && (
                         <p className="text-xs text-muted-foreground">{item.deliveryNote}</p>
+                      )}
+                      {!hasValidAffiliateUrl(item.affiliateUrl) && (
+                        <p className="text-xs text-destructive flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          Deal temporarily unavailable
+                        </p>
                       )}
                     </div>
                   </div>
@@ -93,6 +102,7 @@ const PriceComparisonCard = ({ prices }: PriceComparisonCardProps) => {
                 </motion.button>
               ))}
             </div>
+            <AffiliateDisclosure className="mt-3" />
           </div>
         </CollapsibleContent>
       </Collapsible>

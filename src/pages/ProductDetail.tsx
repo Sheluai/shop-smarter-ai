@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Bell, ExternalLink, Info } from "lucide-react";
+import { ArrowLeft, Heart, Bell, ExternalLink, Info, AlertCircle } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import RecommendationCard from "@/components/RecommendationCard";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
 import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCard";
 import PriceComparisonCard, { PlatformPrice } from "@/components/PriceComparisonCard";
 import AIAlternativesCard, { AlternativeProduct } from "@/components/AIAlternativesCard";
@@ -222,8 +224,16 @@ const ProductDetail = () => {
   const isAlertActive = hasAlertForProduct(product.id);
   const isAlertTriggered = existingAlert?.status === "triggered";
 
+  const canOpenStore = hasValidAffiliateUrl(product.affiliateUrl);
+
   const handleOpenStore = () => {
-    window.open(product.affiliateUrl, "_blank");
+    if (!openAffiliateLink(product.affiliateUrl, product.platform)) {
+      toast({
+        title: "Deal temporarily unavailable",
+        description: "We couldn't open the store link right now. Please try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleWishlist = () => {
@@ -333,10 +343,9 @@ const ProductDetail = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="affiliate-notice flex gap-3"
+          className="affiliate-notice"
         >
-          <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          <p>This app uses affiliate links. If you buy through this link, we may earn a small commission at no extra cost to you.</p>
+          <AffiliateDisclosure />
         </motion.div>
 
         {/* AI Recommendation */}
@@ -355,16 +364,25 @@ const ProductDetail = () => {
 
         {/* Action Buttons */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="space-y-3">
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={handleOpenStore}
-            className={`btn-primary w-full flex items-center justify-center gap-2 ${
-              isAlertTriggered ? "bg-success text-success-foreground" : ""
-            }`}
-          >
-            <ExternalLink className="w-5 h-5" />
-            {isAlertTriggered ? "Open Best Price 🔥" : "Open on Store"}
-          </motion.button>
+          {canOpenStore ? (
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={handleOpenStore}
+              className={`btn-primary w-full flex items-center justify-center gap-2 ${
+                isAlertTriggered ? "bg-success text-success-foreground" : ""
+              }`}
+            >
+              <ExternalLink className="w-5 h-5" />
+              {isAlertTriggered ? "Open Best Price 🔥" : "Open on Store"}
+            </motion.button>
+          ) : (
+            <div className="w-full flex items-center justify-center gap-2 btn-secondary opacity-60 cursor-not-allowed">
+              <AlertCircle className="w-5 h-5" />
+              Deal temporarily unavailable
+            </div>
+          )}
+
+          <AffiliateDisclosure className="px-1" />
 
           <div className="grid grid-cols-2 gap-3">
             <motion.button
