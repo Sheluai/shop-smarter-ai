@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import NotificationBanner from "@/components/NotificationBanner";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+import LoginPromptModal from "@/components/LoginPromptModal";
 import { usePriceAlerts } from "@/contexts/PriceAlertContext";
 import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
+import { useLoginPrompt } from "@/hooks/useLoginPrompt";
 import { useState } from "react";
 import {
   Sheet,
@@ -21,6 +23,7 @@ import { toast } from "@/hooks/use-toast";
 const Alerts = () => {
   const navigate = useNavigate();
   const { alerts, removeAlert, updateAlertPrice } = usePriceAlerts();
+  const { showPrompt, promptMessage, closePrompt } = useLoginPrompt();
   const [editingAlert, setEditingAlert] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState(0);
 
@@ -215,6 +218,12 @@ const Alerts = () => {
           )}
         </SheetContent>
       </Sheet>
+
+      <LoginPromptModal
+        open={showPrompt}
+        onClose={closePrompt}
+        message={promptMessage}
+      />
 
       <BottomNav />
     </div>
