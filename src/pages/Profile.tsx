@@ -75,14 +75,6 @@ const Profile = () => {
             ShopXAI helps you find better prices across Amazon and Flipkart. We track price history, alert you to drops, and help you make smarter shopping decisions.
           </p>
           
-          <Separator className="my-4" />
-          
-          <div className="bg-secondary/50 rounded-xl p-4">
-            <p className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">How we stay free: </span>
-              We earn via affiliate links when you make purchases. This doesn't cost you anything extra.
-            </p>
-          </div>
         </motion.div>
 
         {/* Version */}
