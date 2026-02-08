@@ -3,20 +3,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "@/components/SearchBar";
+import CategoryPills from "@/components/CategoryPills";
 import SmartInsightCard from "@/components/SmartInsightCard";
 import TodayBestDrops from "@/components/TodayBestDrops";
 import BuyOrWaitPicks from "@/components/BuyOrWaitPicks";
-import TopDealsByCategory from "@/components/TopDealsByCategory";
 import DealsUnderBudget from "@/components/DealsUnderBudget";
 import SavingsCard from "@/components/SavingsCard";
 import BottomNav from "@/components/BottomNav";
 import SplashScreen from "@/components/SplashScreen";
+import { useCategories } from "@/hooks/useCategories";
 
 const Home = () => {
   const navigate = useNavigate();
   const [showSplash, setShowSplash] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const { categories } = useCategories();
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 4000);
@@ -28,6 +31,10 @@ const Home = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleCategorySelect = (id: string) => {
+    setSelectedCategory((prev) => (prev === id ? "" : id));
+  };
 
   const sectionDelay = (i: number) => ({
     initial: { opacity: 0, y: 18 },
@@ -98,29 +105,33 @@ const Home = () => {
 
         {/* ───── MAIN CONTENT ───── */}
         <main className="max-w-lg mx-auto px-4 pb-28 space-y-7 mt-2">
-          {/* 3. SMART INSIGHT */}
+          {/* 3. CATEGORY CHIPS */}
           <motion.section {...sectionDelay(0)}>
+            <CategoryPills
+              categories={categories}
+              selected={selectedCategory}
+              onSelect={handleCategorySelect}
+            />
+          </motion.section>
+
+          {/* 4. SMART INSIGHT */}
+          <motion.section {...sectionDelay(1)}>
             <SmartInsightCard />
           </motion.section>
 
-          {/* 4. TODAY'S BEST DROPS */}
-          <motion.section {...sectionDelay(1)}>
-            <TodayBestDrops />
-          </motion.section>
-
-          {/* 5. BUY OR WAIT */}
+          {/* 5. TODAY'S BEST DROPS */}
           <motion.section {...sectionDelay(2)}>
-            <BuyOrWaitPicks />
+            <TodayBestDrops selectedCategory={selectedCategory} />
           </motion.section>
 
-          {/* 6. TOP DEALS BY CATEGORY */}
+          {/* 6. BUY OR WAIT */}
           <motion.section {...sectionDelay(3)}>
-            <TopDealsByCategory />
+            <BuyOrWaitPicks selectedCategory={selectedCategory} />
           </motion.section>
 
           {/* 7. DEALS UNDER BUDGET */}
           <motion.section {...sectionDelay(4)}>
-            <DealsUnderBudget />
+            <DealsUnderBudget selectedCategory={selectedCategory} />
           </motion.section>
 
           {/* 8. SAVINGS CARD */}

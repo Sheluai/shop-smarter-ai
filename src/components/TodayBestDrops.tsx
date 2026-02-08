@@ -10,6 +10,7 @@ const bestDrops = [
     currentPrice: 18990,
     drop: 2000,
     platform: "Amazon",
+    category: "mobiles",
   },
   {
     id: "2",
@@ -18,6 +19,7 @@ const bestDrops = [
     currentPrice: 26999,
     drop: 3500,
     platform: "Flipkart",
+    category: "electronics",
   },
   {
     id: "3",
@@ -26,6 +28,7 @@ const bestDrops = [
     currentPrice: 28990,
     drop: 4010,
     platform: "Amazon",
+    category: "electronics",
   },
   {
     id: "4",
@@ -34,11 +37,49 @@ const bestDrops = [
     currentPrice: 49900,
     drop: 5100,
     platform: "Flipkart",
+    category: "electronics",
+  },
+  {
+    id: "5",
+    title: "Cotton Casual Shirt",
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=200&h=200&fit=crop",
+    currentPrice: 799,
+    drop: 400,
+    platform: "Amazon",
+    category: "fashion",
+  },
+  {
+    id: "6",
+    title: "Smart LED Bulb Pack",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop",
+    currentPrice: 1299,
+    drop: 500,
+    platform: "Flipkart",
+    category: "home",
+  },
+  {
+    id: "7",
+    title: "Instant Pot Duo 7-in-1",
+    image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=200&h=200&fit=crop",
+    currentPrice: 5499,
+    drop: 1500,
+    platform: "Amazon",
+    category: "appliances",
   },
 ];
 
-const TodayBestDrops = () => {
+interface TodayBestDropsProps {
+  selectedCategory: string;
+}
+
+const TodayBestDrops = ({ selectedCategory }: TodayBestDropsProps) => {
   const navigate = useNavigate();
+
+  const filtered = selectedCategory
+    ? bestDrops.filter((d) => d.category === selectedCategory)
+    : bestDrops;
+
+  if (filtered.length === 0) return null;
 
   return (
     <div>
@@ -53,9 +94,9 @@ const TodayBestDrops = () => {
 
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div className="flex gap-3 pb-1">
-          {bestDrops.map((item, index) => (
+          {filtered.map((item, index) => (
             <motion.div
-              key={item.id}
+              key={`${selectedCategory}-${item.id}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
