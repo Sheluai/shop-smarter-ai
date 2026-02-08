@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { Bell, TrendingDown, Check, Trash2, Edit3, Info } from "lucide-react";
+import { Bell, TrendingDown, Check, Trash2, Edit3, Info, ExternalLink, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import NotificationBanner from "@/components/NotificationBanner";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 import { usePriceAlerts } from "@/contexts/PriceAlertContext";
+import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +14,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "@/hooks/use-toast";
 
@@ -139,12 +141,15 @@ const Alerts = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-6 bg-secondary/50 rounded-xl p-4 flex items-start gap-2"
+            className="mt-6 space-y-3"
           >
-            <Info className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-muted-foreground">
-              Price alerts are based on periodic price checks. We'll notify you when the price drops to your target.
-            </p>
+            <div className="bg-secondary/50 rounded-xl p-4 flex items-start gap-2">
+              <Info className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-muted-foreground">
+                Price alerts are based on periodic price checks. We'll notify you when the price drops to your target.
+              </p>
+            </div>
+            <AffiliateDisclosure />
           </motion.div>
         )}
       </div>
@@ -226,6 +231,7 @@ interface AlertCardProps {
     platform: string;
     image: string;
     status: "active" | "triggered";
+    affiliateUrl: string;
   };
   index: number;
   onTap: () => void;
@@ -280,6 +286,31 @@ const AlertCard = ({ alert, index, onTap, onEdit, onRemove }: AlertCardProps) =>
           </div>
         </div>
       </div>
+
+      {/* Open Deal button for triggered alerts */}
+      {alert.status === "triggered" && (
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            openAffiliateLink(alert.affiliateUrl, alert.platform);
+          }}
+          disabled={!hasValidAffiliateUrl(alert.affiliateUrl)}
+          className="w-full flex items-center justify-center gap-2 mt-3 py-2.5 text-sm font-medium text-primary-foreground bg-success rounded-lg hover:bg-success/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {hasValidAffiliateUrl(alert.affiliateUrl) ? (
+            <>
+              <ExternalLink className="w-4 h-4" />
+              Open Best Price 🔥
+            </>
+          ) : (
+            <>
+              <AlertCircle className="w-4 h-4" />
+              Deal temporarily unavailable
+            </>
+          )}
+        </motion.button>
+      )}
 
       {/* Action buttons */}
       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">

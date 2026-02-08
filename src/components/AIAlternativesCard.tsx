@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Sparkles, Info, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
 import {
   Collapsible,
   CollapsibleContent,
@@ -120,11 +121,12 @@ const AIAlternativesCard = ({ alternatives }: AIAlternativesCardProps) => {
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => window.open(product.affiliateUrl, "_blank")}
-                    className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors"
+                    onClick={() => openAffiliateLink(product.affiliateUrl, product.platform)}
+                    disabled={!hasValidAffiliateUrl(product.affiliateUrl)}
+                    className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    Open
+                    {hasValidAffiliateUrl(product.affiliateUrl) ? "Open" : "Unavailable"}
                   </motion.button>
                 </div>
               </motion.div>
