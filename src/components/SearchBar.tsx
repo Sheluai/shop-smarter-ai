@@ -27,7 +27,7 @@ const SearchBar = ({ value = "", onChange, onSubmit }: SearchBarProps) => {
           type="text"
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
-          placeholder="Search product or paste Amazon / Flipkart link"
+          placeholder="Search products or paste store link"
           className="input-search w-full pl-12 pr-4 text-base"
         />
       </div>
