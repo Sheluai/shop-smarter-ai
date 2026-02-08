@@ -2,7 +2,9 @@ import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import ProductCard from "@/components/ProductCard";
+import LoginPromptModal from "@/components/LoginPromptModal";
 import { useState } from "react";
+import { useLoginPrompt } from "@/hooks/useLoginPrompt";
 
 const initialWishlist = [
   {
@@ -25,9 +27,16 @@ const initialWishlist = [
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState(initialWishlist);
+  const { showPrompt, promptMessage, checkWishlistLimit, closePrompt } = useLoginPrompt();
 
   const handleRemove = (id: string) => {
     setWishlist((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // Example: check limit when adding (this would be called from add action)
+  const handleAddToWishlist = (item: typeof initialWishlist[0]) => {
+    if (checkWishlistLimit(wishlist.length)) return;
+    setWishlist((prev) => [...prev, item]);
   };
 
   return (
@@ -76,6 +85,12 @@ const Wishlist = () => {
           </motion.div>
         )}
       </div>
+
+      <LoginPromptModal
+        open={showPrompt}
+        onClose={closePrompt}
+        message={promptMessage}
+      />
 
       <BottomNav />
     </div>
