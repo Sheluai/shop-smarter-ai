@@ -10,6 +10,7 @@ interface Pick {
   status: Status;
   reason: string;
   price: number;
+  category: string;
 }
 
 const picks: Pick[] = [
@@ -20,6 +21,7 @@ const picks: Pick[] = [
     status: "buy",
     reason: "Within 5% of 90-day low",
     price: 18990,
+    category: "mobiles",
   },
   {
     id: "2",
@@ -28,6 +30,7 @@ const picks: Pick[] = [
     status: "wait",
     reason: "Price likely to drop further",
     price: 26999,
+    category: "electronics",
   },
   {
     id: "4",
@@ -36,6 +39,25 @@ const picks: Pick[] = [
     status: "overpriced",
     reason: "Was ₹5K less last month",
     price: 49900,
+    category: "electronics",
+  },
+  {
+    id: "5",
+    title: "Cotton Casual Shirt",
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=120&h=120&fit=crop",
+    status: "buy",
+    reason: "40% off — best in 6 months",
+    price: 799,
+    category: "fashion",
+  },
+  {
+    id: "7",
+    title: "Instant Pot Duo 7-in-1",
+    image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=120&h=120&fit=crop",
+    status: "wait",
+    reason: "Expected sale next week",
+    price: 5499,
+    category: "appliances",
   },
 ];
 
@@ -45,8 +67,18 @@ const statusConfig: Record<Status, { label: string; emoji: string; color: string
   overpriced: { label: "Overpriced", emoji: "🔴", color: "text-destructive", bg: "bg-destructive/10" },
 };
 
-const BuyOrWaitPicks = () => {
+interface BuyOrWaitPicksProps {
+  selectedCategory: string;
+}
+
+const BuyOrWaitPicks = ({ selectedCategory }: BuyOrWaitPicksProps) => {
   const navigate = useNavigate();
+
+  const filtered = selectedCategory
+    ? picks.filter((p) => p.category === selectedCategory)
+    : picks;
+
+  if (filtered.length === 0) return null;
 
   return (
     <div>
@@ -55,11 +87,11 @@ const BuyOrWaitPicks = () => {
       </h2>
 
       <div className="space-y-2.5">
-        {picks.map((pick, index) => {
+        {filtered.map((pick, index) => {
           const config = statusConfig[pick.status];
           return (
             <motion.div
-              key={pick.id}
+              key={`${selectedCategory}-${pick.id}`}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}

@@ -7,7 +7,11 @@ const budgets = [
   { label: "Under ₹9,999", max: 9999 },
 ];
 
-const DealsUnderBudget = () => {
+interface DealsUnderBudgetProps {
+  selectedCategory: string;
+}
+
+const DealsUnderBudget = ({ selectedCategory }: DealsUnderBudgetProps) => {
   const navigate = useNavigate();
 
   return (
@@ -24,7 +28,11 @@ const DealsUnderBudget = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.06, duration: 0.35 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate(`/?budget=${budget.max}`)}
+            onClick={() =>
+              navigate(
+                `/?budget=${budget.max}${selectedCategory ? `&category=${selectedCategory}` : ""}`
+              )
+            }
             className="flex-1 py-3.5 px-3 rounded-xl bg-foreground text-background text-sm font-semibold text-center transition-opacity hover:opacity-90"
           >
             {budget.label}
