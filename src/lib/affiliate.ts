@@ -3,6 +3,8 @@
  * All external product actions must route through these helpers.
  */
 
+import { supabase } from "@/integrations/supabase/client";
+
 const AFFILIATE_TAGS: Record<string, string> = {
   amazon: "shopxai-21",
   flipkart: "shopxai",
@@ -33,16 +35,48 @@ export const buildAffiliateUrl = (
 };
 
 /**
+ * Tracks an affiliate click in the database for analytics.
+ */
+const trackAffiliateClick = (productId?: string, categoryId?: string) => {
+  try {
+    const userId = supabase.auth.getSession().then(({ data }) => data.session?.user?.id);
+    const guestId = localStorage.getItem("shopxai_guest_id");
+
+    // Fire and forget — don't block the user
+    userId.then((uid) => {
+      supabase
+        .from("affiliate_clicks")
+        .insert({
+          product_id: productId || null,
+          category_id: categoryId || null,
+          user_id: uid || null,
+          guest_id: uid ? null : guestId,
+        })
+        .then(() => {
+          // silently tracked
+        });
+    });
+  } catch {
+    // Never block the user for analytics
+  }
+};
+
+/**
  * Opens an affiliate link. Tries deep-link intent first (mobile),
  * then falls back to opening in a new tab.
  */
 export const openAffiliateLink = (
   affiliateUrl: string | undefined,
-  platform: "Amazon" | "Flipkart" | string
+  platform: "Amazon" | "Flipkart" | string,
+  productId?: string,
+  categoryId?: string
 ): boolean => {
   if (!affiliateUrl) return false;
 
   const taggedUrl = buildAffiliateUrl(affiliateUrl, platform);
+
+  // Track click for analytics
+  trackAffiliateClick(productId, categoryId);
 
   // Mark product as viewed
   try {

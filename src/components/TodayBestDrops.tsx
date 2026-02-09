@@ -1,70 +1,54 @@
 import { motion } from "framer-motion";
 import { TrendingDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useProducts, type Product } from "@/hooks/useProducts";
 
-const bestDrops = [
+// Static fallback data for when DB is empty
+const FALLBACK_DROPS = [
   {
-    id: "1",
-    title: "AirPods Pro 2",
-    image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop",
-    currentPrice: 18990,
-    drop: 2000,
-    platform: "Amazon",
-    category: "mobiles",
+    id: "fb-1",
+    name: "AirPods Pro 2",
+    image_url: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop",
+    current_price: 18990,
+    price_drop: 2000,
+    category_id: "mobiles",
+    is_todays_best_drop: true,
   },
   {
-    id: "2",
-    title: "Galaxy Watch 6",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
-    currentPrice: 26999,
-    drop: 3500,
-    platform: "Flipkart",
-    category: "electronics",
+    id: "fb-2",
+    name: "Galaxy Watch 6",
+    image_url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+    current_price: 26999,
+    price_drop: 3500,
+    category_id: "electronics",
+    is_todays_best_drop: true,
   },
   {
-    id: "3",
-    title: "Sony WH-1000XM5",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
-    currentPrice: 28990,
-    drop: 4010,
-    platform: "Amazon",
-    category: "electronics",
+    id: "fb-3",
+    name: "Sony WH-1000XM5",
+    image_url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+    current_price: 28990,
+    price_drop: 4010,
+    category_id: "electronics",
+    is_todays_best_drop: true,
   },
   {
-    id: "4",
-    title: "iPad Air M1",
-    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200&h=200&fit=crop",
-    currentPrice: 49900,
-    drop: 5100,
-    platform: "Flipkart",
-    category: "electronics",
+    id: "fb-4",
+    name: "iPad Air M1",
+    image_url: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200&h=200&fit=crop",
+    current_price: 49900,
+    price_drop: 5100,
+    category_id: "electronics",
+    is_todays_best_drop: true,
   },
   {
-    id: "5",
-    title: "Cotton Casual Shirt",
-    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=200&h=200&fit=crop",
-    currentPrice: 799,
-    drop: 400,
-    platform: "Amazon",
-    category: "fashion",
-  },
-  {
-    id: "6",
-    title: "Smart LED Bulb Pack",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop",
-    currentPrice: 1299,
-    drop: 500,
-    platform: "Flipkart",
-    category: "home",
-  },
-  {
-    id: "7",
-    title: "Instant Pot Duo 7-in-1",
-    image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=200&h=200&fit=crop",
-    currentPrice: 5499,
-    drop: 1500,
-    platform: "Amazon",
-    category: "appliances",
+    id: "fb-5",
+    name: "Cotton Casual Shirt",
+    image_url: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=200&h=200&fit=crop",
+    current_price: 799,
+    price_drop: 400,
+    category_id: "fashion",
+    is_todays_best_drop: true,
   },
 ];
 
@@ -74,10 +58,15 @@ interface TodayBestDropsProps {
 
 const TodayBestDrops = ({ selectedCategory }: TodayBestDropsProps) => {
   const navigate = useNavigate();
+  const { products } = useProducts();
+
+  // Use DB products marked as "best drop", fallback to static
+  const bestDrops = products.filter((p) => p.is_todays_best_drop);
+  const items = bestDrops.length > 0 ? bestDrops : (FALLBACK_DROPS as any[]);
 
   const filtered = selectedCategory
-    ? bestDrops.filter((d) => d.category === selectedCategory)
-    : bestDrops;
+    ? items.filter((d: any) => d.category_id === selectedCategory)
+    : items;
 
   if (filtered.length === 0) return null;
 
@@ -94,7 +83,7 @@ const TodayBestDrops = ({ selectedCategory }: TodayBestDropsProps) => {
 
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div className="flex gap-3 pb-1">
-          {filtered.map((item, index) => (
+          {filtered.map((item: any, index: number) => (
             <motion.div
               key={`${selectedCategory}-${item.id}`}
               initial={{ opacity: 0, x: 20 }}
@@ -107,28 +96,27 @@ const TodayBestDrops = ({ selectedCategory }: TodayBestDropsProps) => {
               <div className="card-soft overflow-hidden">
                 <div className="w-full h-32 bg-secondary overflow-hidden">
                   <img
-                    src={item.image}
-                    alt={item.title}
+                    src={item.image_url || "/placeholder.svg"}
+                    alt={item.name}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
                 </div>
                 <div className="p-3">
-                  <p className="text-xs text-muted-foreground mb-1 truncate">
-                    {item.platform}
-                  </p>
                   <h3 className="text-sm font-medium text-foreground mb-1.5 truncate">
-                    {item.title}
+                    {item.name}
                   </h3>
                   <p className="text-base font-semibold text-foreground">
-                    ₹{item.currentPrice.toLocaleString()}
+                    ₹{item.current_price.toLocaleString()}
                   </p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingDown className="w-3 h-3 text-success" />
-                    <span className="text-xs font-medium text-success">
-                      ↓ ₹{item.drop.toLocaleString()} today
-                    </span>
-                  </div>
+                  {item.price_drop && item.price_drop > 0 && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <TrendingDown className="w-3 h-3 text-success" />
+                      <span className="text-xs font-medium text-success">
+                        ↓ ₹{item.price_drop.toLocaleString()} today
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
