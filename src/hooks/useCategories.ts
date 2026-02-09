@@ -5,7 +5,7 @@ export interface Category {
   category_id: string;
   category_name: string;
   priority_order: number;
-  icon_optional?: string;
+  icon_optional?: string | null;
 }
 
 const CACHE_KEY = "shopxai_categories";
@@ -53,16 +53,16 @@ export function useCategories() {
   const fetchCategories = useCallback(async () => {
     try {
       setIsLoading(true);
-      // API-ready: when a categories table exists, uncomment:
-      // const { data, error } = await supabase
-      //   .from("categories")
-      //   .select("category_id, category_name, priority_order, icon_optional")
-      //   .order("priority_order", { ascending: true });
-      // if (!error && data && data.length > 0) {
-      //   setCategories(data);
-      //   writeCache(data);
-      //   return;
-      // }
+      const { data, error } = await supabase
+        .from("categories")
+        .select("category_id, category_name, priority_order, icon_optional")
+        .order("priority_order", { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setCategories(data);
+        writeCache(data);
+        return;
+      }
 
       // Fallback to defaults
       setCategories(DEFAULT_CATEGORIES);

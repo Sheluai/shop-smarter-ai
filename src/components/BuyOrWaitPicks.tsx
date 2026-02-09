@@ -1,63 +1,56 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useProducts } from "@/hooks/useProducts";
 
 type Status = "buy" | "wait" | "overpriced";
 
-interface Pick {
+interface PickItem {
   id: string;
-  title: string;
-  image: string;
+  name: string;
+  image_url: string | null;
   status: Status;
   reason: string;
-  price: number;
-  category: string;
+  current_price: number;
+  category_id: string | null;
 }
 
-const picks: Pick[] = [
+// Static fallback picks
+const FALLBACK_PICKS: PickItem[] = [
   {
-    id: "1",
-    title: "Apple AirPods Pro (2nd Gen)",
-    image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=120&h=120&fit=crop",
+    id: "fb-1",
+    name: "Apple AirPods Pro (2nd Gen)",
+    image_url: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=120&h=120&fit=crop",
     status: "buy",
     reason: "Within 5% of 90-day low",
-    price: 18990,
-    category: "mobiles",
+    current_price: 18990,
+    category_id: "mobiles",
   },
   {
-    id: "2",
-    title: "Samsung Galaxy Watch 6",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&h=120&fit=crop",
+    id: "fb-2",
+    name: "Samsung Galaxy Watch 6",
+    image_url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&h=120&fit=crop",
     status: "wait",
     reason: "Price likely to drop further",
-    price: 26999,
-    category: "electronics",
+    current_price: 26999,
+    category_id: "electronics",
   },
   {
-    id: "4",
-    title: "iPad Air M1 10.9-inch",
-    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=120&h=120&fit=crop",
+    id: "fb-4",
+    name: "iPad Air M1 10.9-inch",
+    image_url: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=120&h=120&fit=crop",
     status: "overpriced",
     reason: "Was ₹5K less last month",
-    price: 49900,
-    category: "electronics",
+    current_price: 49900,
+    category_id: "electronics",
   },
   {
-    id: "5",
-    title: "Cotton Casual Shirt",
-    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=120&h=120&fit=crop",
+    id: "fb-5",
+    name: "Cotton Casual Shirt",
+    image_url: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=120&h=120&fit=crop",
     status: "buy",
     reason: "40% off — best in 6 months",
-    price: 799,
-    category: "fashion",
-  },
-  {
-    id: "7",
-    title: "Instant Pot Duo 7-in-1",
-    image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=120&h=120&fit=crop",
-    status: "wait",
-    reason: "Expected sale next week",
-    price: 5499,
-    category: "appliances",
+    current_price: 799,
+    category_id: "fashion",
   },
 ];
 
@@ -67,15 +60,39 @@ const statusConfig: Record<Status, { label: string; emoji: string; color: string
   overpriced: { label: "Overpriced", emoji: "🔴", color: "text-destructive", bg: "bg-destructive/10" },
 };
 
+const getDefaultReason = (status: Status): string => {
+  switch (status) {
+    case "buy": return "Great price — buy now";
+    case "wait": return "Expected to drop further";
+    case "overpriced": return "Above average price";
+  }
+};
+
 interface BuyOrWaitPicksProps {
   selectedCategory: string;
 }
 
 const BuyOrWaitPicks = ({ selectedCategory }: BuyOrWaitPicksProps) => {
   const navigate = useNavigate();
+  const { products } = useProducts();
+
+  // Use DB products that have an ai_status, fallback to static
+  const dbPicks: PickItem[] = products
+    .filter((p) => p.ai_status && ["buy", "wait", "overpriced"].includes(p.ai_status))
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      image_url: p.image_url,
+      status: p.ai_status as Status,
+      reason: getDefaultReason(p.ai_status as Status),
+      current_price: p.current_price,
+      category_id: p.category_id,
+    }));
+
+  const picks = dbPicks.length > 0 ? dbPicks : FALLBACK_PICKS;
 
   const filtered = selectedCategory
-    ? picks.filter((p) => p.category === selectedCategory)
+    ? picks.filter((p) => p.category_id === selectedCategory)
     : picks;
 
   if (filtered.length === 0) return null;
@@ -101,8 +118,8 @@ const BuyOrWaitPicks = ({ selectedCategory }: BuyOrWaitPicksProps) => {
             >
               <div className="w-14 h-14 rounded-xl bg-secondary overflow-hidden flex-shrink-0">
                 <img
-                  src={pick.image}
-                  alt={pick.title}
+                  src={pick.image_url || "/placeholder.svg"}
+                  alt={pick.name}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
@@ -110,13 +127,13 @@ const BuyOrWaitPicks = ({ selectedCategory }: BuyOrWaitPicksProps) => {
 
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-foreground truncate">
-                  {pick.title}
+                  {pick.name}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {pick.reason}
                 </p>
                 <p className="text-sm font-semibold text-foreground mt-1">
-                  ₹{pick.price.toLocaleString()}
+                  ₹{pick.current_price.toLocaleString()}
                 </p>
               </div>
 
