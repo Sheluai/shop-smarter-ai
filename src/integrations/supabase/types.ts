@@ -142,6 +142,82 @@ export type Database = {
         }
         Relationships: []
       }
+      deal_notifications: {
+        Row: {
+          deal_score: number
+          deep_link: string | null
+          id: string
+          notification_body: string
+          notification_title: string
+          product_id: string
+          sent_at: string
+          trigger_reason: string
+          user_id: string
+        }
+        Insert: {
+          deal_score: number
+          deep_link?: string | null
+          id?: string
+          notification_body: string
+          notification_title: string
+          product_id: string
+          sent_at?: string
+          trigger_reason: string
+          user_id: string
+        }
+        Update: {
+          deal_score?: number
+          deep_link?: string | null
+          id?: string
+          notification_body?: string
+          notification_title?: string
+          product_id?: string
+          sent_at?: string
+          trigger_reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_notifications_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_snapshots: {
+        Row: {
+          deal_score: number
+          id: string
+          price: number
+          product_id: string
+          snapshot_at: string
+        }
+        Insert: {
+          deal_score?: number
+          id?: string
+          price: number
+          product_id: string
+          snapshot_at?: string
+        }
+        Update: {
+          deal_score?: number
+          id?: string
+          price?: number
+          product_id?: string
+          snapshot_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_snapshots_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           ai_status: string | null
@@ -234,6 +310,33 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -251,6 +354,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_watchlist: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          product_id: string | null
+          target_price: number | null
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          product_id?: string | null
+          target_price?: number | null
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          product_id?: string | null
+          target_price?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_watchlist_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["category_id"]
+          },
+          {
+            foreignKeyName: "user_watchlist_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
