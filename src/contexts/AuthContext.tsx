@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import type { User } from "@supabase/supabase-js";
@@ -15,6 +15,8 @@ interface AuthContextType {
   isGuest: boolean;
   guestId: string;
   isLoading: boolean;
+  justLoggedIn: boolean;
+  clearJustLoggedIn: () => void;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -34,6 +36,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [guestId] = useState(getOrCreateGuestId);
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
+  const wasGuest = useRef(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
@@ -55,10 +59,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(currentUser);
         
         if (currentUser) {
-          // Defer profile fetch to avoid Supabase deadlocks
+          if (wasGuest.current) {
+            setJustLoggedIn(true);
+          }
+          wasGuest.current = false;
           setTimeout(() => fetchProfile(currentUser.id), 0);
         } else {
           setProfile(null);
+          wasGuest.current = true;
         }
         setIsLoading(false);
       }
@@ -86,6 +94,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const clearJustLoggedIn = useCallback(() => setJustLoggedIn(false), []);
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -100,6 +110,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isGuest: !user,
         guestId,
         isLoading,
+        justLoggedIn,
+        clearJustLoggedIn,
         signInWithGoogle,
         signOut,
       }}

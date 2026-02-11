@@ -2,9 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PriceAlertProvider } from "@/contexts/PriceAlertContext";
+import { AnimatePresence } from "framer-motion";
+import { useCallback } from "react";
+import PostLoginAnimation from "@/components/PostLoginAnimation";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
@@ -15,6 +18,35 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppRoutes = () => {
+  const { justLoggedIn, clearJustLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAnimationComplete = useCallback(() => {
+    clearJustLoggedIn();
+    navigate("/", { replace: true });
+  }, [clearJustLoggedIn, navigate]);
+
+  return (
+    <>
+      <AnimatePresence>
+        {justLoggedIn && (
+          <PostLoginAnimation onComplete={handleAnimationComplete} />
+        )}
+      </AnimatePresence>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/alerts" element={<Alerts />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -23,16 +55,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/admin" element={<Admin />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppRoutes />
           </BrowserRouter>
         </PriceAlertProvider>
       </AuthProvider>
