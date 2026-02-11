@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Bell, ExternalLink, Info, AlertCircle } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import RecommendationCard from "@/components/RecommendationCard";
-import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+
 import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
 import PriceHistoryCard, { PriceHistoryData } from "@/components/PriceHistoryCard";
 import PriceComparisonCard, { PlatformPrice } from "@/components/PriceComparisonCard";
@@ -338,15 +338,6 @@ const ProductDetail = () => {
           </motion.div>
         )}
 
-        {/* Affiliate Disclosure */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="affiliate-notice"
-        >
-          <AffiliateDisclosure />
-        </motion.div>
 
         {/* AI Recommendation */}
         <RecommendationCard
@@ -382,7 +373,7 @@ const ProductDetail = () => {
             </div>
           )}
 
-          <AffiliateDisclosure className="px-1" />
+          
 
           <div className="grid grid-cols-2 gap-3">
             <motion.button
