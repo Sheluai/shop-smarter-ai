@@ -2,54 +2,15 @@ import { motion } from "framer-motion";
 import { TrendingDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProducts, type Product } from "@/hooks/useProducts";
+import { useSmartDealMode, type ScoredProduct } from "@/hooks/useSmartDealMode";
+import DealScoreBadge from "@/components/DealScoreBadge";
 
-// Static fallback data for when DB is empty
 const FALLBACK_DROPS = [
-  {
-    id: "fb-1",
-    name: "AirPods Pro 2",
-    image_url: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop",
-    current_price: 18990,
-    price_drop: 2000,
-    category_id: "mobiles",
-    is_todays_best_drop: true,
-  },
-  {
-    id: "fb-2",
-    name: "Galaxy Watch 6",
-    image_url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
-    current_price: 26999,
-    price_drop: 3500,
-    category_id: "electronics",
-    is_todays_best_drop: true,
-  },
-  {
-    id: "fb-3",
-    name: "Sony WH-1000XM5",
-    image_url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
-    current_price: 28990,
-    price_drop: 4010,
-    category_id: "electronics",
-    is_todays_best_drop: true,
-  },
-  {
-    id: "fb-4",
-    name: "iPad Air M1",
-    image_url: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200&h=200&fit=crop",
-    current_price: 49900,
-    price_drop: 5100,
-    category_id: "electronics",
-    is_todays_best_drop: true,
-  },
-  {
-    id: "fb-5",
-    name: "Cotton Casual Shirt",
-    image_url: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=200&h=200&fit=crop",
-    current_price: 799,
-    price_drop: 400,
-    category_id: "fashion",
-    is_todays_best_drop: true,
-  },
+  { id: "fb-1", name: "AirPods Pro 2", image_url: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=200&h=200&fit=crop", current_price: 18990, original_price: 24900, price_drop: 2000, category_id: "mobiles", is_todays_best_drop: true, is_featured: false, ai_status: "buy" },
+  { id: "fb-2", name: "Galaxy Watch 6", image_url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop", current_price: 26999, original_price: 34999, price_drop: 3500, category_id: "electronics", is_todays_best_drop: true, is_featured: false, ai_status: null },
+  { id: "fb-3", name: "Sony WH-1000XM5", image_url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop", current_price: 28990, original_price: 34990, price_drop: 4010, category_id: "electronics", is_todays_best_drop: true, is_featured: true, ai_status: "buy" },
+  { id: "fb-4", name: "iPad Air M1", image_url: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200&h=200&fit=crop", current_price: 49900, original_price: 54900, price_drop: 5100, category_id: "electronics", is_todays_best_drop: true, is_featured: false, ai_status: null },
+  { id: "fb-5", name: "Cotton Casual Shirt", image_url: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=200&h=200&fit=crop", current_price: 799, original_price: 1499, price_drop: 400, category_id: "fashion", is_todays_best_drop: true, is_featured: false, ai_status: "buy" },
 ];
 
 interface TodayBestDropsProps {
@@ -59,16 +20,18 @@ interface TodayBestDropsProps {
 const TodayBestDrops = ({ selectedCategory }: TodayBestDropsProps) => {
   const navigate = useNavigate();
   const { products } = useProducts();
+  const { filterAndSort, enabled: smartMode } = useSmartDealMode();
 
-  // Use DB products marked as "best drop", fallback to static
   const bestDrops = products.filter((p) => p.is_todays_best_drop);
-  const items = bestDrops.length > 0 ? bestDrops : (FALLBACK_DROPS as any[]);
+  const source: Product[] = bestDrops.length > 0 ? bestDrops : FALLBACK_DROPS as any[];
 
-  const filtered = selectedCategory
-    ? items.filter((d: any) => d.category_id === selectedCategory)
-    : items;
+  const categoryFiltered = selectedCategory
+    ? source.filter((d) => d.category_id === selectedCategory)
+    : source;
 
-  if (filtered.length === 0) return null;
+  const scored = filterAndSort(categoryFiltered);
+
+  if (scored.length === 0) return null;
 
   return (
     <div>
@@ -83,7 +46,7 @@ const TodayBestDrops = ({ selectedCategory }: TodayBestDropsProps) => {
 
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div className="flex gap-3 pb-1">
-          {filtered.map((item: any, index: number) => (
+          {scored.map((item, index) => (
             <motion.div
               key={`${selectedCategory}-${item.id}`}
               initial={{ opacity: 0, x: 20 }}
@@ -94,13 +57,18 @@ const TodayBestDrops = ({ selectedCategory }: TodayBestDropsProps) => {
               className="flex-shrink-0 w-40 cursor-pointer"
             >
               <div className="card-soft overflow-hidden">
-                <div className="w-full h-32 bg-secondary overflow-hidden">
+                <div className="relative w-full h-32 bg-secondary overflow-hidden">
                   <img
                     src={item.image_url || "/placeholder.svg"}
                     alt={item.name}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
+                  {smartMode && (
+                    <div className="absolute top-2 left-2">
+                      <DealScoreBadge dealScore={item.dealScore} compact />
+                    </div>
+                  )}
                 </div>
                 <div className="p-3">
                   <h3 className="text-sm font-medium text-foreground mb-1.5 truncate">
