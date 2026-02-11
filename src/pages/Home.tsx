@@ -145,7 +145,7 @@ const Home = () => {
             className="text-center pt-2 pb-4"
           >
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Prices tracked across Amazon, Flipkart & 100+ stores. This app uses affiliate links.
+              Prices tracked across Amazon, Flipkart & 100+ stores.
             </p>
           </motion.footer>
         </main>

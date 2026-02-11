@@ -3,7 +3,7 @@ import { Bell, TrendingDown, Check, Trash2, Edit3, Info, ExternalLink, AlertCirc
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import NotificationBanner from "@/components/NotificationBanner";
-import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+
 import LoginPromptModal from "@/components/LoginPromptModal";
 import { usePriceAlerts } from "@/contexts/PriceAlertContext";
 import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
@@ -152,7 +152,7 @@ const Alerts = () => {
                 Price alerts are based on periodic price checks. We'll notify you when the price drops to your target.
               </p>
             </div>
-            <AffiliateDisclosure />
+            
           </motion.div>
         )}
       </div>

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+
 import { openAffiliateLink, hasValidAffiliateUrl } from "@/lib/affiliate";
 
 export interface PlatformPrice {
@@ -102,7 +102,7 @@ const PriceComparisonCard = ({ prices }: PriceComparisonCardProps) => {
                 </motion.button>
               ))}
             </div>
-            <AffiliateDisclosure className="mt-3" />
+            
           </div>
         </CollapsibleContent>
       </Collapsible>
