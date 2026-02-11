@@ -1,12 +1,13 @@
 import { motion } from "framer-motion";
-import { User, Settings, Heart, Bell, ChevronRight, Info, LogOut, Sun, Moon, Monitor, Eye } from "lucide-react";
+import { User, Settings, Heart, Bell, ChevronRight, Info, LogOut, Sun, Moon, Monitor, Eye, Zap, TrendingDown, Search, PiggyBank, Check } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import LoginPromptModal from "@/components/LoginPromptModal";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoginPrompt } from "@/hooks/useLoginPrompt";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 
 const Profile = () => {
@@ -14,6 +15,15 @@ const Profile = () => {
   const { showPrompt, promptMessage, promptForProfile, closePrompt } = useLoginPrompt();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [smartDealMode, setSmartDealMode] = useState(() => {
+    const stored = localStorage.getItem("shopxai_smart_deal_mode");
+    return stored !== null ? stored === "true" : true;
+  });
+
+  const toggleSmartDealMode = useCallback((checked: boolean) => {
+    setSmartDealMode(checked);
+    localStorage.setItem("shopxai_smart_deal_mode", String(checked));
+  }, []);
 
   useEffect(() => setMounted(true), []);
 
@@ -167,11 +177,64 @@ const Profile = () => {
           )}
         </motion.div>
 
-
+        {/* Smart Deal Mode */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
+          className="card-soft p-5 mb-6"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-foreground">Smart Deal Mode</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  AI-powered buy/wait recommendations
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={smartDealMode}
+              onCheckedChange={toggleSmartDealMode}
+            />
+          </div>
+        </motion.div>
+
+        {/* How ShopXAI Works */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="card-soft p-5 mb-6"
+        >
+          <h2 className="font-semibold text-foreground mb-4">How ShopXAI Works</h2>
+          <div className="space-y-4">
+            {[
+              { icon: Search, title: "Track Prices", desc: "We monitor prices across 100+ stores in real time." },
+              { icon: Bell, title: "Get Alerts", desc: "Set alerts and get notified the moment prices drop." },
+              { icon: PiggyBank, title: "Save More", desc: "Our AI tells you when to buy and when to wait." },
+            ].map((step, i) => (
+              <div key={step.title} className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 mt-0.5">
+                  <step.icon className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">{step.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* About ShopXAI */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
           className="card-soft p-6"
         >
           <div className="flex items-center gap-2 mb-4">
