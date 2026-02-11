@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PriceAlertProvider } from "@/contexts/PriceAlertContext";
 import { AnimatePresence } from "framer-motion";
 import { useCallback } from "react";
+import { useDealNotifications } from "@/hooks/useDealNotifications";
 import PostLoginAnimation from "@/components/PostLoginAnimation";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
@@ -21,6 +22,7 @@ const queryClient = new QueryClient();
 
 const AppRoutes = () => {
   const { justLoggedIn, clearJustLoggedIn } = useAuth();
+  useDealNotifications();
   const navigate = useNavigate();
 
   const handleAnimationComplete = useCallback(() => {
