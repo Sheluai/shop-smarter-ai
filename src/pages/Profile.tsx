@@ -1,16 +1,21 @@
 import { motion } from "framer-motion";
-import { User, Settings, Heart, Bell, ChevronRight, Info, LogOut } from "lucide-react";
+import { User, Settings, Heart, Bell, ChevronRight, Info, LogOut, Sun, Moon, Monitor, Eye } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import LoginPromptModal from "@/components/LoginPromptModal";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoginPrompt } from "@/hooks/useLoginPrompt";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 const Profile = () => {
   const { user, profile, isGuest, signInWithGoogle, signOut } = useAuth();
   const { showPrompt, promptMessage, promptForProfile, closePrompt } = useLoginPrompt();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // Soft prompt when guest opens profile
   useEffect(() => {
@@ -113,7 +118,56 @@ const Profile = () => {
           })}
         </motion.div>
 
-        {/* About Section */}
+        {/* Appearance */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="card-soft p-5 mb-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Sun className="w-5 h-5 text-muted-foreground" />
+            <h2 className="font-semibold text-foreground">Appearance</h2>
+          </div>
+          {mounted && (
+            <div className="grid grid-cols-4 gap-2 p-1 bg-secondary rounded-xl">
+              {[
+                { value: "system", label: "System", icon: Monitor },
+                { value: "light", label: "Light", icon: Sun },
+                { value: "dark", label: "Dark", icon: Moon },
+                { value: "night", label: "Night", icon: Eye },
+              ].map((option) => {
+                const Icon = option.icon;
+                const isActive = theme === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      if (option.value === "night") {
+                        document.documentElement.classList.remove("dark");
+                        document.documentElement.classList.add("night");
+                        setTheme("night");
+                      } else {
+                        document.documentElement.classList.remove("night");
+                        setTheme(option.value);
+                      }
+                    }}
+                    className={`flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-lg text-xs font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
+
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
