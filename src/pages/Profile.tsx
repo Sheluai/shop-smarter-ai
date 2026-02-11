@@ -125,7 +125,7 @@ const Profile = () => {
             <h2 className="font-semibold text-foreground">About ShopXAI</h2>
           </div>
           <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-            ShopXAI helps you find better prices across Amazon and Flipkart. We track price history, alert you to drops, and help you make smarter shopping decisions.
+            ShopXAI helps you find better prices across Amazon, Flipkart & 100+ stores. We track price history, alert you to drops, and help you make smarter shopping decisions.
           </p>
         </motion.div>
 
