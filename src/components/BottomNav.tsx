@@ -1,11 +1,11 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Heart, Bell, User } from "lucide-react";
+import { Home, GitCompareArrows, Ticket, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home" },
-  { path: "/wishlist", icon: Heart, label: "Wishlist" },
-  { path: "/alerts", icon: Bell, label: "Alerts" },
+  { path: "/compare", icon: GitCompareArrows, label: "Compare" },
+  { path: "/coupons", icon: Ticket, label: "Coupons" },
   { path: "/profile", icon: User, label: "Profile" },
 ];
 

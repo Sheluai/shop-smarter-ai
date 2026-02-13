@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Heart } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "@/components/SearchBar";
 import CategoryPills from "@/components/CategoryPills";
@@ -79,21 +79,13 @@ const Home = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showSplash ? 0 : 1 }}
                 transition={{ delay: 0.35, duration: 0.4 }}
-                className="flex items-center gap-1"
               >
                 <button
-                  onClick={() => navigate("/alerts")}
+                  onClick={() => navigate("/profile")}
                   className="p-2.5 rounded-full hover:bg-secondary transition-colors"
-                  aria-label="Alerts"
+                  aria-label="Notifications"
                 >
                   <Bell className="w-5 h-5 text-muted-foreground" />
-                </button>
-                <button
-                  onClick={() => navigate("/wishlist")}
-                  className="p-2.5 rounded-full hover:bg-secondary transition-colors"
-                  aria-label="Wishlist"
-                >
-                  <Heart className="w-5 h-5 text-muted-foreground" />
                 </button>
               </motion.div>
             </div>

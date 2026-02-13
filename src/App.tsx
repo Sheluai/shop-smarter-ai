@@ -12,8 +12,8 @@ import { useDealNotifications } from "@/hooks/useDealNotifications";
 import PostLoginAnimation from "@/components/PostLoginAnimation";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
-import Wishlist from "./pages/Wishlist";
-import Alerts from "./pages/Alerts";
+import Compare from "./pages/Compare";
+import Coupons from "./pages/Coupons";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -40,8 +40,8 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/alerts" element={<Alerts />} />
+        <Route path="/compare" element={<Compare />} />
+        <Route path="/coupons" element={<Coupons />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
