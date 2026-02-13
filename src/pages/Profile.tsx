@@ -1,17 +1,21 @@
 import { motion } from "framer-motion";
-import { User, Settings, Heart, Bell, ChevronRight, Info, LogOut, Sun, Moon, Monitor, Eye, Zap, TrendingDown, Search, PiggyBank, Check } from "lucide-react";
+import { User, Settings, Heart, Bell, ChevronRight, Info, LogOut, Sun, Moon, Monitor, Eye, Zap, TrendingDown, Search, PiggyBank, Check, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import LoginPromptModal from "@/components/LoginPromptModal";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useLoginPrompt } from "@/hooks/useLoginPrompt";
 import { useEffect, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 
 const Profile = () => {
   const { user, profile, isGuest, signInWithGoogle, signOut } = useAuth();
+  const { isAdmin } = useAdminAuth();
+  const navigate = useNavigate();
   const { showPrompt, promptMessage, promptForProfile, closePrompt } = useLoginPrompt();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -98,6 +102,32 @@ const Profile = () => {
             </motion.button>
           )}
         </motion.div>
+
+        {/* Admin Dashboard Link */}
+        {isAdmin && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-6"
+          >
+            <button
+              onClick={() => navigate("/admin")}
+              className="w-full flex items-center justify-between p-4 card-soft hover:bg-secondary/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-destructive" />
+                </div>
+                <div className="text-left">
+                  <span className="font-medium text-foreground">Admin Dashboard</span>
+                  <p className="text-xs text-muted-foreground">Manage products, categories & more</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+          </motion.div>
+        )}
 
         {/* Menu Items */}
         <motion.div
