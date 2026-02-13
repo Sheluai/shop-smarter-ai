@@ -220,9 +220,12 @@ export type Database = {
       }
       products: {
         Row: {
+          affiliate_url: string | null
           ai_status: string | null
           ai_status_override: boolean
           category_id: string | null
+          coupon_code: string | null
+          coupon_expiry: string | null
           created_at: string
           current_price: number
           id: string
@@ -233,12 +236,17 @@ export type Database = {
           name: string
           original_price: number | null
           price_drop: number | null
+          product_url: string | null
+          store: string | null
           updated_at: string
         }
         Insert: {
+          affiliate_url?: string | null
           ai_status?: string | null
           ai_status_override?: boolean
           category_id?: string | null
+          coupon_code?: string | null
+          coupon_expiry?: string | null
           created_at?: string
           current_price?: number
           id?: string
@@ -249,12 +257,17 @@ export type Database = {
           name: string
           original_price?: number | null
           price_drop?: number | null
+          product_url?: string | null
+          store?: string | null
           updated_at?: string
         }
         Update: {
+          affiliate_url?: string | null
           ai_status?: string | null
           ai_status_override?: boolean
           category_id?: string | null
+          coupon_code?: string | null
+          coupon_expiry?: string | null
           created_at?: string
           current_price?: number
           id?: string
@@ -265,6 +278,8 @@ export type Database = {
           name?: string
           original_price?: number | null
           price_drop?: number | null
+          product_url?: string | null
+          store?: string | null
           updated_at?: string
         }
         Relationships: [

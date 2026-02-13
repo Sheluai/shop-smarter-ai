@@ -5,6 +5,7 @@ import { Shield, Loader2 } from "lucide-react";
 import AdminCategories from "@/components/admin/AdminCategories";
 import AdminProducts from "@/components/admin/AdminProducts";
 import AdminAffiliateLinks from "@/components/admin/AdminAffiliateLinks";
+import AdminCoupons from "@/components/admin/AdminCoupons";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 
@@ -57,20 +58,22 @@ const Admin = () => {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <Tabs defaultValue="categories" className="space-y-6">
-          <TabsList className="w-full grid grid-cols-5 h-auto">
-            <TabsTrigger value="categories" className="text-xs py-2">Categories</TabsTrigger>
+        <Tabs defaultValue="products" className="space-y-6">
+          <TabsList className="w-full grid grid-cols-6 h-auto">
             <TabsTrigger value="products" className="text-xs py-2">Products</TabsTrigger>
+            <TabsTrigger value="categories" className="text-xs py-2">Categories</TabsTrigger>
+            <TabsTrigger value="coupons" className="text-xs py-2">Coupons</TabsTrigger>
             <TabsTrigger value="affiliates" className="text-xs py-2">Affiliates</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs py-2">Settings</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs py-2">Analytics</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs py-2">Settings</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="categories"><AdminCategories /></TabsContent>
           <TabsContent value="products"><AdminProducts /></TabsContent>
+          <TabsContent value="categories"><AdminCategories /></TabsContent>
+          <TabsContent value="coupons"><AdminCoupons /></TabsContent>
           <TabsContent value="affiliates"><AdminAffiliateLinks /></TabsContent>
-          <TabsContent value="settings"><AdminSettings /></TabsContent>
           <TabsContent value="analytics"><AdminAnalytics /></TabsContent>
+          <TabsContent value="settings"><AdminSettings /></TabsContent>
         </Tabs>
       </div>
     </div>
