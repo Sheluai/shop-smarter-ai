@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "@/components/SearchBar";
+import SmartVerdictSection from "@/components/SmartVerdictSection";
 import CategoryPills from "@/components/CategoryPills";
 import SmartInsightCard from "@/components/SmartInsightCard";
 import TodayBestDrops from "@/components/TodayBestDrops";
@@ -106,8 +107,13 @@ const Home = () => {
             />
           </motion.section>
 
-          {/* 4. SMART INSIGHT */}
+          {/* 4. PASTE LINK → SMART VERDICT */}
           <motion.section {...sectionDelay(1)}>
+            <SmartVerdictSection />
+          </motion.section>
+
+          {/* 5. SMART INSIGHT */}
+          <motion.section {...sectionDelay(2)}>
             <SmartInsightCard />
           </motion.section>
 
