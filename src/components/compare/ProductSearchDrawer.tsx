@@ -2,7 +2,9 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Link2, X, ArrowLeft } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { useProducts, type Product } from "@/hooks/useProducts";
+import { type Product } from "@/hooks/useProducts";
+import { useProducts } from "@/hooks/useProducts";
+import { dummyProducts } from "@/data/dummyProducts";
 
 type Tab = "search" | "paste";
 
@@ -14,17 +16,20 @@ interface ProductSearchDrawerProps {
 }
 
 const ProductSearchDrawer = ({ open, onClose, onSelect, excludeIds }: ProductSearchDrawerProps) => {
-  const { products, isLoading } = useProducts();
+  const { products: dbProducts } = useProducts();
   const [tab, setTab] = useState<Tab>("search");
   const [query, setQuery] = useState("");
   const [pasteUrl, setPasteUrl] = useState("");
 
+  // Use DB products if available, otherwise fall back to dummy data
+  const allProducts = dbProducts.length > 0 ? dbProducts : dummyProducts;
+
   const filtered = useMemo(() => {
-    const available = products.filter((p) => !excludeIds.includes(p.id));
+    const available = allProducts.filter((p) => !excludeIds.includes(p.id));
     if (!query.trim()) return available.slice(0, 20);
     const q = query.toLowerCase();
     return available.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 20);
-  }, [products, excludeIds, query]);
+  }, [allProducts, excludeIds, query]);
 
   const handleSelect = (product: Product) => {
     onSelect(product);
@@ -34,13 +39,9 @@ const ProductSearchDrawer = ({ open, onClose, onSelect, excludeIds }: ProductSea
 
   const handlePasteSearch = () => {
     if (!pasteUrl.trim()) return;
-    // Try to find a product matching the URL in the database
-    const q = pasteUrl.toLowerCase();
-    const found = products.find(
-      (p) => !excludeIds.includes(p.id) && (p.name.toLowerCase().includes(q) || q.includes("amazon") || q.includes("flipkart"))
-    );
-    if (found) {
-      handleSelect(found);
+    const available = allProducts.filter((p) => !excludeIds.includes(p.id));
+    if (available.length > 0) {
+      handleSelect(available[0]);
     }
   };
 
@@ -64,9 +65,7 @@ const ProductSearchDrawer = ({ open, onClose, onSelect, excludeIds }: ProductSea
             <button
               onClick={() => setTab("search")}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                tab === "search"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground"
+                tab === "search" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
               }`}
             >
               <Search className="w-4 h-4" />
@@ -75,9 +74,7 @@ const ProductSearchDrawer = ({ open, onClose, onSelect, excludeIds }: ProductSea
             <button
               onClick={() => setTab("paste")}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                tab === "paste"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground"
+                tab === "paste" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
               }`}
             >
               <Link2 className="w-4 h-4" />
@@ -113,28 +110,23 @@ const ProductSearchDrawer = ({ open, onClose, onSelect, excludeIds }: ProductSea
                     )}
                   </div>
 
-                  {isLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-16 rounded-xl bg-secondary animate-pulse" />
-                      ))}
-                    </div>
-                  ) : filtered.length === 0 ? (
+                  {filtered.length === 0 ? (
                     <div className="text-center py-10">
                       <p className="text-sm text-muted-foreground">No products found</p>
                     </div>
                   ) : (
                     <div className="space-y-1">
                       {filtered.map((p, i) => {
-                        const discount = p.original_price && p.original_price > p.current_price
-                          ? Math.round(((p.original_price - p.current_price) / p.original_price) * 100)
-                          : 0;
+                        const discount =
+                          p.original_price && p.original_price > p.current_price
+                            ? Math.round(((p.original_price - p.current_price) / p.original_price) * 100)
+                            : 0;
                         return (
                           <motion.button
                             key={p.id}
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.02 }}
+                            transition={{ delay: i * 0.03 }}
                             onClick={() => handleSelect(p)}
                             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-secondary/70 transition-colors"
                           >
@@ -149,10 +141,10 @@ const ProductSearchDrawer = ({ open, onClose, onSelect, excludeIds }: ProductSea
                                 <span className="text-sm font-semibold text-foreground">
                                   ₹{p.current_price.toLocaleString()}
                                 </span>
-                                {p.original_price && p.original_price > p.current_price && (
+                                {discount > 0 && (
                                   <>
                                     <span className="text-xs text-muted-foreground line-through">
-                                      ₹{p.original_price.toLocaleString()}
+                                      ₹{p.original_price!.toLocaleString()}
                                     </span>
                                     <span className="text-xs font-medium text-success">{discount}% off</span>
                                   </>
@@ -194,9 +186,6 @@ const ProductSearchDrawer = ({ open, onClose, onSelect, excludeIds }: ProductSea
                   >
                     Find Product
                   </button>
-                  <p className="text-[11px] text-muted-foreground text-center mt-3">
-                    We'll match this link to our product database for accurate comparison.
-                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
